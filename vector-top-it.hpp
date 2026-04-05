@@ -59,7 +59,7 @@ namespace topit {
   }
 }
 template< class T >
-void topit::Vecotr< T >::pushFront(const T& val)
+void topit::Vector< T >::pushFront(const T& val)
 {
   Vector< T > result(getSize() + 1);
   result[0] = val;
@@ -103,6 +103,17 @@ topit::Vector< T >& topit::Vector< T >::operator=(const Vector< T >& rhs)
   swap(cpy);
   return *this;
 }
+
+template<class T>
+topit::Vector< T >& topit::operator=(const Vector<T>& lhs, const Vector<T>& rhs)
+{
+  Vector< T > cpy(rhs);
+  std::swap(data_, cpy.data_);
+  std::swap(size_, cpy.size_);
+  std::swap(capacity_, cpy.capacity_);
+  return *this;
+}
+
 template< class T >
 void topit::Vector< T >::swap(Vector< T >& rhs) noexcept
 {
@@ -147,6 +158,11 @@ size_t topit::Vector< T >::getSize() const noexcept
   return size_;
 }
 template< class T >
+size_t topit::Vector<T>::getCapacity() const noexcept
+{
+  return capacity_;
+}
+template< class T >
 topit::Vector< T >::Vector():
  data_(nullptr),
  size_(0),
@@ -157,4 +173,53 @@ topit::Vector< T >::~Vector()
 {
   delete [] data_;
 }
+
+template< class T >
+T& topit::Vector<T>::operator[](size_t id) noexcept
+{
+  return data_[id];
+}
+
+template< class T >
+const T& topit::Vector<T>::operator[](size_t id) const noexcept
+{
+  return data_[id];
+}
+
+template< class T >
+void topit::Vector<T>::pushBack(const T& val)
+{
+  if (size_ == capacity_) {
+    size_t new_capacity = (capacity_ == 0) ? 1 : capacity_ * 2;
+    T* new_data = new T[new_capacity];
+    for (size_t i = 0; i < size_; ++i) {
+      new_data[i] = data_[i];
+    }
+    delete[] data_;
+    data_ = new_data;
+    capacity_ = new_capacity;
+  }
+  data_[size_] = val;
+  ++size_;
+}
+template<class T>
+bool topit::operator==(const Vector<T>& lhs, const Vector<T>& rhs)
+{
+  if (lhs.getSize() != rhs.getSize()) {
+    return false;
+  }
+  for (size_t i = 0; i < lhs.getSize(); ++i) {
+    if (lhs[i] != rhs[i]) {
+      return false;
+    }
+  }
+  return true;
+}
+
+template<class T>
+bool topit::operator!=(const Vector<T>& lhs, const Vector<T>& rhs)
+{
+  return !(lhs == rhs);
+}
+
 #endif
