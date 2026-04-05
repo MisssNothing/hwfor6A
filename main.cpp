@@ -149,10 +149,9 @@ bool test17() {
 bool test18() {
   Vector<std::string> v1(3, "hello");
   Vector<std::string> v2(5, "world");
-  Vector<std::string> original_v1(v1);
   try {
     v1 = v2;
-    return v1.getSize() == 5 && v1[0] == "world";
+    return v1.getSize() == 5 && v1[0] == "world" && v1[4] == "world";
   } catch (...) {
     return false;
   }
@@ -186,7 +185,7 @@ int main() {
     { test16, "16. Copy/Swap: non-empty to empty" },
     { test17, "17. Copy/Swap: different sizes" },
     { test18, "18. Copy/Swap: exception safety" },
-    { test19, "19. Copy/Swap: copy constructor using swap idiom" },
+    { test19, "19. Copy/Swap: copy constructor" },
   };
 
   size_t count = sizeof(tests) / sizeof(case_t);

@@ -54,6 +54,89 @@ namespace topit {
   template< class T >
   bool operator!=(const Vector< T >&, const Vector< T >&);
 }
+
+template< class T >
+void topit::Vector< T >::insert(size_t pos, const T& val)
+{
+  if (pos > size_) {
+    throw std::out_of_range("insert position out of range");
+  }
+  if (size_ == capacity_) {
+    size_t new_capacity = (capacity_ == 0) ? 1 : capacity_ * 2;
+    T* new_data = new T[new_capacity];
+    for (size_t i = 0; i < pos; ++i) {
+      new_data[i] = data_[i];
+    }
+    new_data[pos] = val;
+    for (size_t i = pos; i < size_; ++i) {
+      new_data[i + 1] = data_[i];
+    }
+    delete[] data_;
+    data_ = new_data;
+    capacity_ = new_capacity;
+  } else {
+    for (size_t i = size_; i > pos; --i) {
+      data_[i] = data_[i - 1];
+    }
+    data_[pos] = val;
+  }
+  ++size_;
+}
+
+template< class T >
+void topit::Vector< T >::insert(size_t pos, const Vector< T >& rhs, size_t b, size_t e)
+{
+  if (pos > size_) {
+    throw std::out_of_range("insert position out of range");
+  }
+  if (b > e || e > rhs.getSize()) {
+    throw std::out_of_range("range [b, e) is invalid");
+  }
+  size_t count = e - b;
+  if (count == 0) return;
+  size_t new_size = size_ + count;
+  if (new_size > capacity_) {
+    size_t new_capacity = capacity_;
+    while (new_capacity < new_size) {
+      new_capacity = (new_capacity == 0) ? 1 : new_capacity * 2;
+    }
+    T* new_data = new T[new_capacity];
+    for (size_t i = 0; i < pos; ++i) {
+      new_data[i] = data_[i];
+    }
+    for (size_t i = 0; i < count; ++i) {
+      new_data[pos + i] = rhs.data_[b + i];
+    }
+    for (size_t i = pos; i < size_; ++i) {
+      new_data[i + count] = data_[i];
+    }
+    delete[] data_;
+    data_ = new_data;
+    capacity_ = new_capacity;
+  } else {
+    for (size_t i = size_; i > pos; --i) {
+      data_[i + count - 1] = data_[i - 1];
+    }
+    for (size_t i = 0; i < count; ++i) {
+      data_[pos + i] = rhs.data_[b + i];
+    }
+  }
+  size_ = new_size;
+}
+
+template< class T >
+void topit::Vector< T >::erase(size_t pos)
+{
+  if (pos >= size_) {
+    throw std::out_of_range("erase position out of range");
+  }
+  for (size_t i = pos; i < size_ - 1; ++i) {
+    data_[i] = data_[i + 1];
+  }
+  --size_;
+}
+
+
 template< class T >
 void topit::Vector< T >::pushFront(const T& val)
 {
