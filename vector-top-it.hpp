@@ -31,7 +31,26 @@ namespace topit {
     // Домашняя работа
     // 1. Реализовать итераторы для вектора (сами итераторы НЕ тестировать)
     // 2. Придумать по 3 штуки insert/erase (в сумме 6) с итераторами
-    struct VectorIterator;
+    struct VectorIterator {
+      T* ptr;
+
+      VectorIterator() : ptr(nullptr) {}
+      explicit VectorIterator(T* p) : ptr(p) {}
+
+      T& operator*() { return *ptr; }
+      const T& operator*() const { return *ptr; }
+
+      VectorIterator& operator++() { ++ptr; return *this; }
+      VectorIterator operator++(int) { VectorIterator tmp = *this; ++ptr; return tmp; }
+
+      VectorIterator& operator--() { --ptr; return *this; }
+      VectorIterator operator--(int) { VectorIterator tmp = *this; --ptr; return tmp; }
+
+      bool operator==(const VectorIterator& other) const { return ptr == other.ptr; }
+      bool operator!=(const VectorIterator& other) const { return ptr != other.ptr; }
+    };
+    VectorIterator begin() { return VectorIterator(data_); }
+    VectorIterator end() { return VectorIterator(data_ + size_); }
     void insert(VectorIterator pos, const T& val);
     void erase(VectorIterator pos);
     template< class IT >
@@ -53,6 +72,64 @@ namespace topit {
   bool operator==(const Vector< T >&, const Vector< T >&);
   template< class T >
   bool operator!=(const Vector< T >&, const Vector< T >&);
+}
+
+template< class T >
+void topit::Vector< T >::insert(VectorIterator pos, const T& val)
+{
+  size_t index = pos.ptr - data_;
+  insert(index, val);
+}
+
+template< class T >
+void topit::Vector< T >::erase(VectorIterator pos)
+{
+  size_t index = pos.ptr - data_;
+  erase(index);
+}
+
+template< class T >
+template< class IT >
+void topit::Vector< T >::insert(VectorIterator pos, IT begin, IT end)
+{
+  size_t index = pos.ptr - data_;
+  size_t count = 0;
+  for (IT it = begin; it != end; ++it) {
+    ++count;
+  }
+  if (count == 0) return;
+  size_t new_size = size_ + count;
+  if (new_size > capacity_) {
+    size_t new_capacity = capacity_;
+    while (new_capacity < new_size) {
+      new_capacity = (new_capacity == 0) ? 1 : new_capacity * 2;
+    }
+    T* new_data = new T[new_capacity];
+    for (size_t i = 0; i < index; ++i) {
+      new_data[i] = data_[i];
+    }
+    IT it = begin;
+    for (size_t i = 0; i < count; ++i) {
+      new_data[index + i] = *it;
+      ++it;
+    }
+    for (size_t i = index; i < size_; ++i) {
+      new_data[i + count] = data_[i];
+    }
+    delete[] data_;
+    data_ = new_data;
+    capacity_ = new_capacity;
+  } else {
+    for (size_t i = size_; i > index; --i) {
+      data_[i + count - 1] = data_[i - 1];
+    }
+    IT it = begin;
+    for (size_t i = 0; i < count; ++i) {
+      data_[index + i] = *it;
+      ++it;
+    }
+  }
+  size_ = new_size;
 }
 
 template< class T >
