@@ -50,13 +50,9 @@ namespace topit {
   };
 
   template< class T >
-  bool operator==(const Vector< T >&, const Vector< T >&) {
-    return false;
-  }
+  bool operator==(const Vector< T >&, const Vector< T >&);
   template< class T >
-  bool operator!=(const Vector< T >&, const Vector< T >&) {
-    return false;
-  }
+  bool operator!=(const Vector< T >&, const Vector< T >&);
 }
 template< class T >
 void topit::Vector< T >::pushFront(const T& val)
@@ -76,6 +72,8 @@ topit::Vector< T >::Vector(Vector&& rhs) noexcept:
   capacity_(rhs.capacity_)
 {
   rhs.data_ = nullptr;
+  rhs.size_ = 0;
+  rhs.capacity_ = 0;
 }
 template< class T >
 topit::Vector< T >::Vector(const Vector< T >& rhs):
@@ -88,29 +86,25 @@ topit::Vector< T >::Vector(const Vector< T >& rhs):
 template< class T >
 topit::Vector< T >& topit::Vector< T >::operator=(Vector< T >&& rhs) noexcept
 {
-  Vector< T > cpy(std::move(rhs));
-  swap(cpy);
+  if (this != std::addressof(rhs)) {
+    delete[] data_;
+    data_ = rhs.data_;
+    size_ = rhs.size_;
+    capacity_ = rhs.capacity_;
+    rhs.data_ = nullptr;
+    rhs.size_ = 0;
+    rhs.capacity_ = 0;
+  }
   return *this;
 }
 template< class T >
 topit::Vector< T >& topit::Vector< T >::operator=(const Vector< T >& rhs)
 {
-  if (this == std::addressof(rhs))
+  if (this != std::addressof(rhs))
   {
-    return *this;
+    Vector< T > cpy(rhs);
+    swap(cpy);
   }
-  Vector< T > cpy(rhs);
-  swap(cpy);
-  return *this;
-}
-
-template<class T>
-topit::Vector< T >& topit::operator=(const Vector<T>& lhs, const Vector<T>& rhs)
-{
-  Vector< T > cpy(rhs);
-  std::swap(data_, cpy.data_);
-  std::swap(size_, cpy.size_);
-  std::swap(capacity_, cpy.capacity_);
   return *this;
 }
 

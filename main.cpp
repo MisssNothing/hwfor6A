@@ -107,6 +107,63 @@ bool test12() {
   return yav == cpy;
 }
 
+bool test13() {
+  Vector<int> v1(3, 5);
+  Vector<int> v2;
+  v2 = v1;
+  return v2 == v1 && v2.getSize() == 3 && v2[0] == 5 && v2[2] == 5;
+}
+
+bool test14() {
+  Vector<int> v(3, 42);
+  Vector<int> original(v);
+  v = v;
+  return v == original && v[0] == 42 && v.getSize() == 3;
+}
+
+bool test15() {
+  Vector<int> v1;
+  Vector<int> v2(5, 10);
+  v1 = v2;
+  return v1.getSize() == 5 && v1[0] == 10 && v1[4] == 10;
+}
+
+bool test16() {
+  Vector<int> v1(5, 10);
+  Vector<int> v2;
+  v1 = v2;
+  return v1.isEmpty() && v2.isEmpty() && v1.getSize() == 0;
+}
+
+bool test17() {
+  Vector<int> v1(2, 1);
+  Vector<int> v2(4, 2);
+  v1 = v2;
+  if (v1.getSize() != 4) return false;
+  for (size_t i = 0; i < 4; ++i) {
+    if (v1[i] != 2) return false;
+  }
+  return true;
+}
+
+bool test18() {
+  Vector<std::string> v1(3, "hello");
+  Vector<std::string> v2(5, "world");
+  Vector<std::string> original_v1(v1);
+  try {
+    v1 = v2;
+    return v1.getSize() == 5 && v1[0] == "world";
+  } catch (...) {
+    return false;
+  }
+}
+
+bool test19() {
+  Vector<int> original(4, 100);
+  Vector<int> copy(original);
+  return copy == original && copy[0] == 100 && copy[3] == 100;
+}
+
 int main() {
   using test_t = bool(*)();
   using case_t = std::pair< test_t, const char* >;
@@ -122,7 +179,14 @@ int main() {
     { test9, "Copy assignment operator"},
     { test10, "Swap for two vectors"},
     { test11, "Move constructor"},
-    { test12, "Move assignment operator"}
+    { test12, "Move assignment operator"},
+    { test13, "13. Copy/Swap: basic assignment" },
+    { test14, "14. Copy/Swap: self-assignment safety" },
+    { test15, "15. Copy/Swap: empty to non-empty" },
+    { test16, "16. Copy/Swap: non-empty to empty" },
+    { test17, "17. Copy/Swap: different sizes" },
+    { test18, "18. Copy/Swap: exception safety" },
+    { test19, "19. Copy/Swap: copy constructor using swap idiom" },
   };
 
   size_t count = sizeof(tests) / sizeof(case_t);
