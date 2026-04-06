@@ -1,6 +1,7 @@
 #ifndef VECTOR_TOP_IT_HPP
 #define VECTOR_TOP_IT_HPP
 #include <cstddef>
+#include <initializer_list>
 namespace topit {
   template< class T >
   struct Vector {
@@ -12,6 +13,8 @@ namespace topit {
     Vector< T >& operator=(const Vector< T >&);
     Vector(Vector< T >&&) noexcept;
     Vector< T >& operator=(Vector< T >&&) noexcept;
+
+    Vector(std::initializer_list< T > il);
 
     void swap(Vector< T >&) noexcept;
     bool isEmpty() const noexcept;
@@ -73,6 +76,17 @@ namespace topit {
   template< class T >
   bool operator!=(const Vector< T >&, const Vector< T >&);
 }
+
+template< class T >
+topit::Vector< T >::Vector(std::initializer_list< T > il):
+  Vector(il.size())
+{
+  size_t i = 0;
+  for (auto it = il.begin(); it != il.end(); ++it) {
+    data_[i++] = *it;
+  }
+}
+
 
 template< class T >
 void topit::Vector< T >::insert(VectorIterator pos, const T& val)

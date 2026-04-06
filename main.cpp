@@ -163,6 +163,16 @@ bool test19() {
   return copy == original && copy[0] == 100 && copy[3] == 100;
 }
 
+bool test20() {
+  Vector< int > v{3, 1};
+  return (v.getSize() == 2) && (v.at(0) == 3) && (v.at(1) == 1);
+}
+
+bool test21() {
+  Vector<int> v{};
+  return v.isEmpty();
+}
+
 int main() {
   using test_t = bool(*)();
   using case_t = std::pair< test_t, const char* >;
@@ -186,6 +196,8 @@ int main() {
     { test17, "17. Copy/Swap: different sizes" },
     { test18, "18. Copy/Swap: exception safety" },
     { test19, "19. Copy/Swap: copy constructor" },
+    {test20, "Non empty initializer list ctr"},
+    {test21, ""},
   };
 
   size_t count = sizeof(tests) / sizeof(case_t);
